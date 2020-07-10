@@ -1,0 +1,4 @@
+- hosts: docker         #对应hosts配置文件的两个节点
+  become: true             # 执行使用sudo
+  roles:           
+    - docker

@@ -1,0 +1,35 @@
+- name: install required packeages
+  yum:
+    name: "{{ item }}"    #需要进行安装的一些包名
+    state: present        #安装包的状态
+  with_items:
+    - yum-utils
+    - device-mapper-persistent-data 
+    - lvm2
+
+- name: add docker repo to /etc/yum.repos.d
+  shell: yum-config-manager --add-repo https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+  register: result       # 将shell的操作结果注册为result
+
+- name: install docker-ce
+  yum:
+    name: docker-ce
+    state: present
+  when: result is success #上面结果为success，任务执行
+
+- name: create /etc/docker
+  file:
+    path: /etc/docker
+    state: directory
+
+- name: start docker service
+  systemd:
+    name: docker
+    state: started
+    enabled: true
+
+- name: provide docker-ce configfile
+  template:
+    src: daemon.json.j2
+    dest: /etc/docker/daemon.json
+  notify: restart docker

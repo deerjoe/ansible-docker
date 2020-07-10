@@ -1,0 +1,5 @@
+- name: restart docker
+  systemd:
+    name: docker
+    state: restarted            #触发机制后，将服务进行重启
+    enabled: true
